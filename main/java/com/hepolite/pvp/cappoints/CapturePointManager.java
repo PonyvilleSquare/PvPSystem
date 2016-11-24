@@ -27,8 +27,20 @@ import com.palmergames.bukkit.towny.object.Town;
 public class CapturePointManager implements Listener
 {
 	/** Event used to allow players to capture control points */
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
-	public void onPlayerBreakBlock(BlockBreakEvent event)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
+	public void onPlayerBreakBlockInitial(BlockBreakEvent event)
+	{
+		if (event.getBlock().getType() != Material.STANDING_BANNER)
+			return;
+		CapturePoint point = getPoint(event.getBlock().getLocation());
+		if (point == null || point.getOwner() == null)
+			return;
+		event.setCancelled(false);
+	}
+	
+	/** Event used to allow players to capture control points */
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerBreakBlockFinal(BlockBreakEvent event)
 	{
 		if (event.getBlock().getType() != Material.STANDING_BANNER)
 			return;
@@ -37,13 +49,12 @@ public class CapturePointManager implements Listener
 			return;
 
 		broadcast(point.getOwner(), point.getLocation(), String.format("&c%s&f is no longer controlled by &c%s&f!", point.getName(), point.getOwner()));
-		event.setCancelled(false);
 		point.setOwner(null);
 	}
 
 	/** Event used to allow players to capture control points */
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
-	public void onPlayerPlaceBlock(BlockPlaceEvent event)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
+	public void onPlayerPlaceBlockInitial(BlockPlaceEvent event)
 	{
 		Player player = event.getPlayer();
 		if (player == null || event.getBlock().getType() != Material.STANDING_BANNER)
@@ -74,8 +85,6 @@ public class CapturePointManager implements Listener
 			banner.setPatterns(pattern.getValue());
 			banner.update(true);
 			event.setCancelled(false);
-			broadcast(town.getName(), point.getLocation(), String.format("&c%s&f is now under control of &c%s&f!", point.getName(), town.getName()));
-			point.setOwner(town.getName());
 		}
 		else if (point.getOwner().equals(town.getName()))
 		{
@@ -86,6 +95,24 @@ public class CapturePointManager implements Listener
 		{
 			player.sendMessage(ChatColor.RED + "You cannot capture this point while another town has claimed it!");
 			event.setCancelled(true);
+		}
+	}
+	
+	/** Event used to allow players to capture control points */
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerPlaceBlockFinal(BlockPlaceEvent event)
+	{
+		Player player = event.getPlayer();
+		if (player == null || event.getBlock().getType() != Material.STANDING_BANNER)
+			return;
+		CapturePoint point = getPoint(event.getBlock().getLocation());
+		if (point == null)
+			return;
+		if (point.getOwner() == null)
+		{
+			Town town = TownyHelper.getPlayerTown(player);
+			broadcast(town.getName(), point.getLocation(), String.format("&c%s&f is now under control of &c%s&f!", point.getName(), town.getName()));
+			point.setOwner(town.getName());
 		}
 	}
 

@@ -9,7 +9,7 @@ commands:
   pvpreload:
     description: Reloads the configs for the PvP system
     permission: pvp.reload
-    usage: rs_player player message
+    usage: pvpreload
     permission-message: Sorry, you don't have permission to use this command.
   pvptoggle:
     description: Toggles PvP on or off
@@ -71,6 +71,11 @@ commands:
     aliases: [home]
     permission: pvp.homesystem
     permission-message: Sorry, you don't have permission to use this command.
+  pvpstarttimer:
+    description: Starts the combat timer system
+    usage: /pvpstarttimer
+    permission: pvp.timer
+    permission-message: Sorry, you don't have permission to use this command.
 permissions:
   pvp.user:
     description: Gives access to basic PvPSystem commands
@@ -98,4 +103,7 @@ permissions:
     default: false
   pvp.homesystem:
     description: Allows players to set a home and warp there, if needed
+    default: false
+  pvp.timer:
+    description: Allows players to start the combat timer system
     default: false

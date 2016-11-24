@@ -215,7 +215,7 @@ public class SettingsCore extends Settings
 	public final void removePoint(CapturePoint point)
 	{
 		points.remove(point.getName());
-		set("points." + writeSimpleLocation(point.getLocation()), null);
+		remove("points." + writeSimpleLocation(point.getLocation()));
 		save();
 	}
 
@@ -276,30 +276,22 @@ public class SettingsCore extends Settings
 	{
 		for (Entry<DyeColor, List<Pattern>> entry : patterns.values())
 		{
-			boolean similar = true;
 			if (!baseColor.equals(entry.getKey()))
-				similar = false;
-			else
+				return false;
+
+			List<Pattern> current = entry.getValue();
+			if (pattern.size() != current.size())
+				return false;
+
+			for (int i = 0; i < pattern.size(); i++)
 			{
-				List<Pattern> current = entry.getValue();
-				if (pattern.size() != current.size())
-					similar = false;
-				else
-					for (int i = 0; i < pattern.size(); i++)
-					{
-						Pattern patternA = pattern.get(i);
-						Pattern patternB = current.get(i);
-						if (!patternA.getColor().equals(patternB.getColor()) || !patternA.getPattern().equals(patternB.getPattern()))
-						{
-							similar = false;
-							break;
-						}
-					}
+				Pattern patternA = pattern.get(i);
+				Pattern patternB = current.get(i);
+				if (!patternA.getColor().equals(patternB.getColor()) || !patternA.getPattern().equals(patternB.getPattern()))
+					return false;
 			}
-			if (similar)
-				return true;
 		}
-		return false;
+		return true;
 	}
 
 	// //////////////////////////////////////////////////////////////////////
