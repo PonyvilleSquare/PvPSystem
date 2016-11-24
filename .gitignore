@@ -48,4 +48,5 @@ Temporary Items
 
 # Eclipse & Junk
 bin/
-PvpSystem 1.0.2/
+.classpath
+.project
