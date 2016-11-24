@@ -1,6 +1,7 @@
 package com.hepolite.pvp.commands;
 
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -37,17 +38,17 @@ public class CmdStoreBanner implements CommandExecutor
 			return true;
 		}
 		BannerMeta meta = (BannerMeta) banner.getItemMeta();
-		if (PvP.getCoreData().bannerExists(meta.getBaseColor(), meta.getPatterns()))
+		@SuppressWarnings("deprecation")
+		DyeColor baseColor = (meta.getBaseColor() != null ? meta.getBaseColor() : DyeColor.getByDyeData((byte) banner.getDurability()));
+
+		if (baseColor == null || meta.getPatterns() == null || meta.getPatterns().size() == 0)
+			player.sendMessage(ChatColor.RED + "The banner is too simple to be used");
+		else if (PvP.getCoreData().bannerExists(baseColor, meta.getPatterns()))
 			player.sendMessage(ChatColor.RED + "The banner is already in use by a town!");
 		else
 		{
-			if (meta.getPatterns() == null || meta.getPatterns().size() == 0)
-				player.sendMessage(ChatColor.RED + "The banner is too simple to be used");
-			else
-			{
-				PvP.getCoreData().setBannerPattern(town, meta.getBaseColor(), meta.getPatterns());
-				player.sendMessage(ChatColor.WHITE + "The banner for the town " + ChatColor.RED + town.getName() + ChatColor.WHITE + " has been set");
-			}
+			PvP.getCoreData().setBannerPattern(town, baseColor, meta.getPatterns());
+			player.sendMessage(ChatColor.WHITE + "The banner for the town " + ChatColor.RED + town.getName() + ChatColor.WHITE + " has been set");
 		}
 		return true;
 	}

@@ -15,6 +15,7 @@ import com.hepolite.pvp.commands.CmdReload;
 import com.hepolite.pvp.commands.CmdRemovePoint;
 import com.hepolite.pvp.commands.CmdRemoveZone;
 import com.hepolite.pvp.commands.CmdResetPoint;
+import com.hepolite.pvp.commands.CmdStartTimers;
 import com.hepolite.pvp.commands.CmdStoreBanner;
 
 public class PvP extends JavaPlugin
@@ -51,6 +52,7 @@ public class PvP extends JavaPlugin
 		getCommand("pvpremzone").setExecutor(new CmdRemoveZone());
 		getCommand("pvpsethome").setExecutor(new CmdSetHome());
 		getCommand("pvphome").setExecutor(new CmdHome());
+		getCommand("pvpstarttimer").setExecutor(new CmdStartTimers());
 	}
 
 	@Override

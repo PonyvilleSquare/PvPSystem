@@ -3,6 +3,8 @@ package com.hepolite.pvp;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,9 +16,13 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
+import com.hepolite.pvp.cappoints.CapturePoint;
+
 public class PvPManager implements Listener, Runnable
 {
 	private final HashMap<UUID, Account> playerAccounts = new HashMap<UUID, Account>();
+	
+	private int announcementCountdownTimer = -1;
 
 	/** Returns the account associated with the given player */
 	public final Account getAccount(Player player)
@@ -37,6 +43,36 @@ public class PvPManager implements Listener, Runnable
 	{
 		for (Account account : playerAccounts.values())
 			account.onTick();
+		
+		announcementCountdownTimer--;
+		if (announcementCountdownTimer == 0)
+		{
+			boolean anyPointIsControlled = false;
+			for (CapturePoint point : PvP.getCoreData().getPoints())
+			{
+				if (point.getOwner() != null)
+				{
+					anyPointIsControlled = true;
+					Bukkit.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', String.format("- &c%s&f belongs to &c%s&f", point.getName(), point.getOwner())));
+				}
+				else
+					Bukkit.getServer().broadcastMessage(ChatColor.translateAlternateColorCodes('&', String.format("- &c%s&f is not controlled by anyone", point.getName())));
+			}
+			if (!anyPointIsControlled)
+				Bukkit.getServer().broadcastMessage(ChatColor.RED + "No town controls any control points!");
+		}
+		else if (announcementCountdownTimer == 60 * 1)
+			Bukkit.getServer().broadcastMessage(ChatColor.RED + "Capture points will be tallied in one minute!");
+		else if (announcementCountdownTimer == 60 * 5)
+			Bukkit.getServer().broadcastMessage(ChatColor.RED + "Capture points will be tallied in five minutes!");
+		else if (announcementCountdownTimer == 60 * 15)
+			Bukkit.getServer().broadcastMessage(ChatColor.RED + "Capture points will be tallied in fifteen minutes!");
+		else if (announcementCountdownTimer == 60 * 30)
+			Bukkit.getServer().broadcastMessage(ChatColor.RED + "Capture points will be tallied in thirty minutes!");
+		else if (announcementCountdownTimer == 60 * 60)
+			Bukkit.getServer().broadcastMessage(ChatColor.RED + "Capture points will be tallied in one hour!");
+		else if (announcementCountdownTimer == 60 * 90)
+			Bukkit.getServer().broadcastMessage(ChatColor.RED + "Capture points will be tallied in one and a half hour!");
 	}
 
 	/** Event used to prevent players from being able to hurt each other in certain cases */
@@ -83,5 +119,11 @@ public class PvPManager implements Listener, Runnable
 				attacker = (Entity) source;
 		}
 		return (attacker instanceof Player ? (Player) attacker : null);
+	}
+	
+	/** Starts the capture point countdown timer; will count from 1.5 hours */
+	public final void startAnnouncementTimer()
+	{
+		announcementCountdownTimer = 60 * 90 + 1;
 	}
 }
