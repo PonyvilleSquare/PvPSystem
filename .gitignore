@@ -46,7 +46,21 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Eclipse & Junk
-bin/
-.classpath
+#Eclipse
 .project
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+#Gradle
+.idea/
+.gradle/
+build/
